@@ -1,0 +1,33 @@
+[Unit]
+Description=Valheim Server
+After=docker.service
+Requires=docker.service
+ConditionPathExists=/opt/valheim-env
+
+[Service]
+TimeoutStartSec=0
+
+StandardOutput=append:/var/log/valheim.log
+StandardError=append:/var/log/valheim.log
+
+ExecStartPre=-/usr/bin/docker stop %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run \
+          --name %n \
+          --pull=always \
+          --rm \
+          --cap-add=sys_nice \
+          --stop-timeout 120 \
+          -v /opt/valheim-config:/config:Z \
+          -v /opt/valheim-server:/opt/valheim:Z \
+          -p 2456-2457:2456-2457/udp \
+          --env-file /opt/valheim-env \
+          ghcr.io/lloesche/valheim-server
+
+ExecStop=/usr/bin/docker stop %n
+
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target
