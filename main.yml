@@ -57,9 +57,10 @@
 
   - name: Copy valheim-config directory
     synchronize:
-      src: valheim-config
-      dest: /opt/valheim-config
+      src: valheim-config/
+      dest: /opt/valheim-config/
       recursive: yes
-      delete: yes
       checksum: yes
+      delete: yes
+      rsync_opts: ["--exclude=.DS_Store"]
     when: not valheim_config.stat.exists
